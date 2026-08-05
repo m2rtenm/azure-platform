@@ -17,6 +17,13 @@ variable "subscription_id" {
   nullable    = true
 }
 
+variable "tenant_id" {
+  description = "Microsoft Entra tenant ID used for Azure RBAC in AKS. Leave null to use the Azure CLI tenant."
+  type        = string
+  default     = null
+  nullable    = true
+}
+
 variable "resource_group_name" {
   description = "Resource group that contains the development platform resources."
   type        = string
@@ -40,41 +47,65 @@ variable "acr_sku" {
   }
 }
 
+variable "log_analytics_retention_in_days" {
+  description = "Retention period for AKS Container Insights logs."
+  type        = number
+  default     = 30
+
+  validation {
+    condition     = var.log_analytics_retention_in_days >= 30 && var.log_analytics_retention_in_days <= 730
+    error_message = "log_analytics_retention_in_days must be between 30 and 730."
+  }
+}
+
 variable "kubernetes_version" {
-  description = "Optional AKS Kubernetes version. Leave null to use Azure's default supported version."
+  description = "Optional AKS version. Leave null to use Azure's default supported version."
   type        = string
   default     = null
   nullable    = true
 }
 
-variable "system_node_vm_size" {
-  description = "VM size for the always-on AKS system node pool."
+variable "aks_sku_tier" {
+  description = "AKS SKU tier. Free is suitable for the development environment."
   type        = string
-  default     = "Standard_B2s"
+  default     = "Free"
+
+  validation {
+    condition     = contains(["Free", "Standard", "Premium"], var.aks_sku_tier)
+    error_message = "aks_sku_tier must be Free, Standard, or Premium."
+  }
 }
 
-variable "system_node_min" {
-  description = "Minimum system node count. Keep at 1 for a working AKS cluster."
-  type        = number
-  default     = 1
+variable "aks_system_node_pool" {
+  description = "System node pool configuration."
+  type = object({
+    vm_size         = string
+    min_count       = number
+    max_count       = number
+    os_disk_size_gb = number
+  })
+  default = {
+    vm_size         = "Standard_B2s"
+    min_count       = 1
+    max_count       = 2
+    os_disk_size_gb = 30
+  }
 }
 
-variable "system_node_max" {
-  description = "Maximum system node count for cluster autoscaling."
-  type        = number
-  default     = 2
-}
-
-variable "user_node_vm_size" {
-  description = "VM size for the scale-to-zero AKS user node pool."
-  type        = string
-  default     = "Standard_B2s"
-}
-
-variable "user_node_max" {
-  description = "Maximum user node count for cluster autoscaling."
-  type        = number
-  default     = 2
+variable "aks_user_node_pool" {
+  description = "User node pool configuration."
+  type = object({
+    vm_size         = string
+    min_count       = number
+    max_count       = number
+    os_disk_size_gb = number
+  })
+  default = {
+    vm_size         = "Standard_B2s"
+    min_count       = 0
+    max_count       = 2
+    os_disk_size_gb = 30
+  }
 }
 
 variable "tags" {

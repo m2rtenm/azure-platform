@@ -1,16 +1,24 @@
-output "cluster_id" {
+output "id" {
+  description = "AKS cluster resource ID."
   value       = azurerm_kubernetes_cluster.this.id
-  description = "AKS resource ID."
 }
-output "cluster_name" {
-  value       = azurerm_kubernetes_cluster.this.name
+
+output "name" {
   description = "AKS cluster name."
+  value       = azurerm_kubernetes_cluster.this.name
 }
+
 output "oidc_issuer_url" {
+  description = "OIDC issuer URL for Kubernetes workload identity federation."
   value       = azurerm_kubernetes_cluster.this.oidc_issuer_url
-  description = "OIDC issuer URL."
 }
-output "identity_principal_id" {
-  value       = azurerm_user_assigned_identity.this.principal_id
-  description = "AKS user-assigned identity principal ID."
+
+output "control_plane_identity_principal_id" {
+  description = "Principal ID of the AKS control-plane managed identity."
+  value       = azurerm_user_assigned_identity.control_plane.principal_id
+}
+
+output "kubelet_identity_principal_id" {
+  description = "Principal ID of the AKS kubelet managed identity."
+  value       = azurerm_user_assigned_identity.kubelet.principal_id
 }

@@ -4,14 +4,15 @@ Terraform-managed Azure platform, built incrementally as a production-style port
 
 ## Current phase
 
-**Phase 4 — Container Registry** is ready to apply. It adds a low-cost Basic Azure Container Registry (ACR) to store images for the future AKS platform.
+**Phase 5 — AKS** is implemented and ready to apply. It adds a production-oriented Kubernetes baseline with Azure CNI Overlay, Azure RBAC, managed identities, workload identity, autoscaling node pools, Azure Policy, Container Insights, and ACR image-pull authorization.
 
 Completed phases:
 
 1. **Bootstrap** — remote Terraform state in Azure Blob Storage.
 2. **Repository foundation** — reusable modules, isolated environments, and Azure AD-backed remote state configuration.
 3. **Networking** — applied: North Europe VNet, dedicated subnets, NSGs, and route table.
-4. **Container Registry** — implemented and validated; awaiting `terraform apply`.
+4. **Container Registry** — Basic SKU image registry, with Entra ID/RBAC authentication and admin access disabled.
+5. **AKS** — system and user pools, autoscaling, Azure CNI Overlay, Azure RBAC/Policy, OIDC/workload identity, Container Insights, and least-privilege ACR pulls.
 
 ## Repository layout
 
@@ -22,8 +23,9 @@ azure-platform/
 │   ├── dev/          # Deployable development environment root
 │   └── prod/         # Reserved for a future subscription/environment
 ├── modules/
-│   └── network/      # VNet, subnets, NSGs, and route table
-│   └── acr/          # Azure Container Registry
+│   ├── network/      # VNet, subnets, NSGs, and route table
+│   ├── acr/          # Azure Container Registry
+│   └── aks/          # AKS cluster, node pools, RBAC, and identity
 ├── docs/             # Platform documentation
 └── .github/          # CI/CD workflows added in a later phase
 ```
@@ -32,10 +34,28 @@ Do not commit generated `*.tfvars` files or Terraform state. The repository `.gi
 
 ## Next step
 
-Review and apply the Phase 4 plan from `environments/dev`:
+The initial Phase 5 apply creates ACR, AKS, and the Log Analytics workspace. These services incur Azure charges.
+
+AKS derives the Microsoft Entra tenant from the active Azure CLI session. To override it, set `tenant_id` in an ignored local `terraform.tfvars`:
 
 ```bash
-terraform apply acr.tfplan
+tenant_id = "<your-microsoft-entra-tenant-id>"
 ```
 
-The Basic ACR tier has a small recurring charge. See [`docs/container-registry.md`](docs/container-registry.md) for its security, cost, and upgrade path.
+Then review and apply the combined ACR and AKS plan:
+
+```bash
+cd environments/dev
+terraform init -backend-config=backend.hcl
+terraform plan -out platform.tfplan
+terraform apply platform.tfplan
+```
+
+After deployment, configure `kubectl`:
+
+```bash
+az aks get-credentials --resource-group rg-azplat-dev-neu --name aks-azplat-dev
+kubectl get nodes
+```
+
+See [`modules/aks/README.md`](modules/aks/README.md) for the module architecture and network requirements.
