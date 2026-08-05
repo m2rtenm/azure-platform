@@ -17,6 +17,18 @@ variable "subscription_id" {
   nullable    = true
 }
 
+variable "resource_group_name" {
+  description = "Resource group that contains the development platform resources."
+  type        = string
+  default     = "rg-azplat-dev-neu"
+}
+
+variable "vnet_address_space" {
+  description = "CIDR range for the development platform virtual network."
+  type        = list(string)
+  default     = ["10.0.0.0/16"]
+}
+
 variable "tags" {
   description = "Common tags passed to all modules."
   type        = map(string)

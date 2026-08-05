@@ -20,6 +20,9 @@ crash.*.log
 # Local Azure Blob backend configuration.
 backend.hcl
 
+# Saved Terraform plans.
+*.tfplan
+
 # Ignore override files as they are usually used to override resources locally and so
 # are not checked in
 override.tf

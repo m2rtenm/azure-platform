@@ -25,7 +25,7 @@ resource "azurerm_storage_account" "terraform_state" {
   https_traffic_only_enabled      = true
   public_network_access_enabled   = true
   allow_nested_items_to_be_public = false
-  shared_access_key_enabled = true
+  shared_access_key_enabled       = true
 
   blob_properties {
     versioning_enabled       = true
