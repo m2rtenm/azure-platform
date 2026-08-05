@@ -1,0 +1,16 @@
+# Copy this file to terraform.tfvars and adjust it for your subscription.
+# The real terraform.tfvars is intentionally ignored by Git.
+
+location                    = "northeurope"
+resource_group_name         = "rg-tfstate-dev-neu"
+storage_account_name_prefix = "sttfstate"
+
+# Optional: omit this line to use `az account set --subscription ...` instead.
+# subscription_id = "00000000-0000-0000-0000-000000000000"
+
+tags = {
+  environment = "shared"
+  managed_by  = "terraform"
+  project     = "azure-platform"
+  owner       = "your-name"
+}
