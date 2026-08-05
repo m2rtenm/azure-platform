@@ -22,3 +22,18 @@ output "network_security_group_ids" {
   description = "Network security group IDs keyed by platform role."
   value       = module.network.network_security_group_ids
 }
+
+output "acr_id" {
+  description = "Azure Container Registry resource ID."
+  value       = module.acr.id
+}
+
+output "acr_login_server" {
+  description = "Container image registry hostname."
+  value       = module.acr.login_server
+}
+
+output "acr_name" {
+  description = "Globally unique Azure Container Registry name."
+  value       = module.acr.name
+}

@@ -29,6 +29,17 @@ variable "vnet_address_space" {
   default     = ["10.0.0.0/16"]
 }
 
+variable "acr_sku" {
+  description = "Azure Container Registry SKU. Basic is the low-cost development default."
+  type        = string
+  default     = "Basic"
+
+  validation {
+    condition     = contains(["Basic", "Standard", "Premium"], var.acr_sku)
+    error_message = "acr_sku must be Basic, Standard, or Premium."
+  }
+}
+
 variable "tags" {
   description = "Common tags passed to all modules."
   type        = map(string)

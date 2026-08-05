@@ -4,13 +4,14 @@ Terraform-managed Azure platform, built incrementally as a production-style port
 
 ## Current phase
 
-**Phase 3 — Networking** is ready to apply. It defines the North Europe development network: a platform resource group, VNet, dedicated AKS, PostgreSQL, Application Gateway, and private-endpoint subnets, network security groups, and a route table.
+**Phase 4 — Container Registry** is ready to apply. It adds a low-cost Basic Azure Container Registry (ACR) to store images for the future AKS platform.
 
 Completed phases:
 
 1. **Bootstrap** — remote Terraform state in Azure Blob Storage.
 2. **Repository foundation** — reusable modules, isolated environments, and Azure AD-backed remote state configuration.
-3. **Networking** — implemented and validated; awaiting `terraform apply`.
+3. **Networking** — applied: North Europe VNet, dedicated subnets, NSGs, and route table.
+4. **Container Registry** — implemented and validated; awaiting `terraform apply`.
 
 ## Repository layout
 
@@ -22,6 +23,7 @@ azure-platform/
 │   └── prod/         # Reserved for a future subscription/environment
 ├── modules/
 │   └── network/      # VNet, subnets, NSGs, and route table
+│   └── acr/          # Azure Container Registry
 ├── docs/             # Platform documentation
 └── .github/          # CI/CD workflows added in a later phase
 ```
@@ -30,10 +32,10 @@ Do not commit generated `*.tfvars` files or Terraform state. The repository `.gi
 
 ## Next step
 
-Review and apply the Phase 3 plan from `environments/dev`:
+Review and apply the Phase 4 plan from `environments/dev`:
 
 ```bash
-terraform apply network.tfplan
+terraform apply acr.tfplan
 ```
 
-The planned network foundation has no recurring resource charge on its own. See [`docs/networking.md`](docs/networking.md) for the topology and constraints.
+The Basic ACR tier has a small recurring charge. See [`docs/container-registry.md`](docs/container-registry.md) for its security, cost, and upgrade path.

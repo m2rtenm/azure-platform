@@ -11,3 +11,13 @@ module "network" {
   vnet_address_space  = var.vnet_address_space
   tags                = var.tags
 }
+
+module "acr" {
+  source = "../../modules/acr"
+
+  location            = var.location
+  resource_group_name = module.network.resource_group_name
+  name_prefix         = local.name_prefix
+  sku                 = var.acr_sku
+  tags                = var.tags
+}
