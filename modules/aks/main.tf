@@ -33,13 +33,13 @@ resource "azurerm_kubernetes_cluster" "this" {
   kubernetes_version  = var.kubernetes_version
   sku_tier            = var.sku_tier
 
-  azure_policy_enabled               = true
-  local_account_disabled             = true
-  oidc_issuer_enabled                = true
-  workload_identity_enabled          = true
-  automatic_upgrade_channel          = var.automatic_channel_upgrade
-  node_os_upgrade_channel            = "NodeImage"
-  role_based_access_control_enabled  = true
+  azure_policy_enabled              = true
+  local_account_disabled            = true
+  oidc_issuer_enabled               = true
+  workload_identity_enabled         = true
+  automatic_upgrade_channel         = var.automatic_channel_upgrade
+  node_os_upgrade_channel           = "NodeImage"
+  role_based_access_control_enabled = true
 
   default_node_pool {
     name                         = "system"
