@@ -40,12 +40,12 @@ output "acr_name" {
 
 output "aks_cluster_id" {
   description = "AKS cluster resource ID."
-  value       = module.aks.cluster_id
+  value       = module.aks.id
 }
 
 output "aks_cluster_name" {
   description = "AKS cluster name."
-  value       = module.aks.cluster_name
+  value       = module.aks.name
 }
 
 output "aks_oidc_issuer_url" {
@@ -53,7 +53,17 @@ output "aks_oidc_issuer_url" {
   value       = module.aks.oidc_issuer_url
 }
 
-output "aks_identity_principal_id" {
-  description = "User-assigned identity principal ID used by AKS."
-  value       = module.aks.identity_principal_id
+output "aks_control_plane_identity_principal_id" {
+  description = "Principal ID of the AKS control-plane managed identity."
+  value       = module.aks.control_plane_identity_principal_id
+}
+
+output "aks_kubelet_identity_principal_id" {
+  description = "Principal ID of the AKS kubelet managed identity."
+  value       = module.aks.kubelet_identity_principal_id
+}
+
+output "log_analytics_workspace_id" {
+  description = "Log Analytics workspace resource ID used by AKS Container Insights."
+  value       = azurerm_log_analytics_workspace.aks.id
 }

@@ -1,6 +1,6 @@
 # Development environment
 
-This is the Terraform root for the development platform. It uses the shared Azure Blob backend created by `bootstrap/`; it does not create Azure resources until a module is composed here.
+This is the Terraform root for the development platform. It uses the shared Azure Blob backend created by `bootstrap/` and composes networking, ACR, AKS, and the Log Analytics workspace required by AKS Container Insights.
 
 ## Backend setup
 
@@ -24,4 +24,19 @@ terraform validate
 terraform plan
 ```
 
-The expected Phase 2 plan makes no Azure changes. Phase 3 will compose the network module here.
+## AKS prerequisites
+
+AKS Azure RBAC automatically reads the tenant ID from the authenticated Azure CLI session. To override it explicitly, create an ignored local variables file:
+
+```hcl
+# terraform.tfvars
+tenant_id = "<your-microsoft-entra-tenant-id>"
+```
+
+Retrieve it with:
+
+```bash
+az account show --query tenantId --output tsv
+```
+
+The current configuration includes ACR and AKS, so its first apply creates all platform resources not already in remote state. Review the plan carefully because AKS and its virtual machines incur Azure charges.

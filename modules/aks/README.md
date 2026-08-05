@@ -1,25 +1,25 @@
 # AKS module
 
-Creates a production-oriented AKS foundation with Azure CNI Overlay, Azure RBAC, workload identity, OIDC issuer, Azure Policy, automatic patch upgrades, and cluster autoscaling.
+Creates a production-oriented Azure Kubernetes Service (AKS) baseline:
 
-## Node pools and cost
+- User-assigned identities for the control plane and kubelets.
+- Azure RBAC, Azure Policy, OIDC issuer, workload identity, and disabled local accounts.
+- Azure CNI Overlay with Azure network policy.
+- Dedicated autoscaling system and user node pools.
+- Container Insights with managed-identity authentication.
+- `Network Contributor` on the AKS subnet and `AcrPull` only for the kubelet identity.
+- Configurable automatic upgrade channel and node image updates.
 
-- The **system** pool has a minimum of one `Standard_B2s` VM. It is required for core Kubernetes services and incurs VM charges continuously.
-- The **user** pool can autoscale to zero, so application capacity costs nothing while it has no nodes.
-- The standard Azure Load Balancer created for AKS can also incur charges once it handles traffic.
+## Development capacity and cost
 
-This module intentionally does not create Log Analytics monitoring until the monitoring phase.
+The development defaults keep one low-cost system node available and permit the user workload pool to scale to zero. AKS, virtual machines, the standard load balancer, ACR, and Log Analytics can all incur Azure charges.
 
-## Identity
+## Networking requirements
 
-The module creates a user-assigned managed identity and grants it:
+The AKS node subnet must not overlap with the pod or service CIDRs. The development defaults use:
 
-- `Network Contributor` on the AKS subnet, before cluster creation;
-- `AcrPull` on the project ACR.
-
-To access the cluster locally after deployment, use Azure RBAC then run:
-
-```bash
-az aks get-credentials --resource-group "rg-azplat-dev-neu" --name "aks-azplat-dev" --overwrite-existing
-kubectl get nodes
-```
+| Range | Purpose |
+| --- | --- |
+| `10.0.1.0/24` | AKS nodes |
+| `10.244.0.0/16` | Azure CNI Overlay pods |
+| `10.2.0.0/24` | Kubernetes services |
