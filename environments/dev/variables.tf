@@ -40,6 +40,43 @@ variable "acr_sku" {
   }
 }
 
+variable "kubernetes_version" {
+  description = "Optional AKS Kubernetes version. Leave null to use Azure's default supported version."
+  type        = string
+  default     = null
+  nullable    = true
+}
+
+variable "system_node_vm_size" {
+  description = "VM size for the always-on AKS system node pool."
+  type        = string
+  default     = "Standard_B2s"
+}
+
+variable "system_node_min" {
+  description = "Minimum system node count. Keep at 1 for a working AKS cluster."
+  type        = number
+  default     = 1
+}
+
+variable "system_node_max" {
+  description = "Maximum system node count for cluster autoscaling."
+  type        = number
+  default     = 2
+}
+
+variable "user_node_vm_size" {
+  description = "VM size for the scale-to-zero AKS user node pool."
+  type        = string
+  default     = "Standard_B2s"
+}
+
+variable "user_node_max" {
+  description = "Maximum user node count for cluster autoscaling."
+  type        = number
+  default     = 2
+}
+
 variable "tags" {
   description = "Common tags passed to all modules."
   type        = map(string)
