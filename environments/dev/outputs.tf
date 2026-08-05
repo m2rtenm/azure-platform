@@ -67,3 +67,29 @@ output "log_analytics_workspace_id" {
   description = "Log Analytics workspace resource ID used by AKS Container Insights."
   value       = azurerm_log_analytics_workspace.aks.id
 }
+
+output "postgresql_server_id" {
+  description = "PostgreSQL Flexible Server resource ID."
+  value       = module.postgresql.id
+}
+
+output "postgresql_server_name" {
+  description = "PostgreSQL Flexible Server name."
+  value       = module.postgresql.name
+}
+
+output "postgresql_fqdn" {
+  description = "Private PostgreSQL server FQDN."
+  value       = module.postgresql.fqdn
+}
+
+output "postgresql_database_name" {
+  description = "Initial PostgreSQL database name."
+  value       = module.postgresql.database_name
+}
+
+output "postgresql_administrator_password" {
+  description = "Generated PostgreSQL administrator password. Treat as secret."
+  value       = module.postgresql.administrator_password
+  sensitive   = true
+}

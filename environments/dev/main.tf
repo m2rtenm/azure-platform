@@ -49,3 +49,21 @@ module "aks" {
   user_node_pool             = var.aks_user_node_pool
   tags                       = var.tags
 }
+
+module "postgresql" {
+  source = "../../modules/postgresql"
+
+  location              = var.location
+  resource_group_name   = module.network.resource_group_name
+  name_prefix           = local.name_prefix
+  virtual_network_id    = module.network.vnet_id
+  delegated_subnet_id   = module.network.subnet_ids.postgresql
+  administrator_login   = var.postgresql_administrator_login
+  database_name         = var.postgresql_database_name
+  postgresql_version    = var.postgresql_version
+  sku_name              = var.postgresql_sku_name
+  storage_mb            = var.postgresql_storage_mb
+  backup_retention_days = var.postgresql_backup_retention_days
+  zone                  = var.postgresql_zone
+  tags                  = var.tags
+}

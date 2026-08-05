@@ -108,6 +108,64 @@ variable "aks_user_node_pool" {
   }
 }
 
+variable "postgresql_administrator_login" {
+  description = "PostgreSQL administrator login name."
+  type        = string
+  default     = "pgadmin"
+}
+
+variable "postgresql_database_name" {
+  description = "Initial database name for platform workloads."
+  type        = string
+  default     = "platform"
+}
+
+variable "postgresql_version" {
+  description = "PostgreSQL Flexible Server major version."
+  type        = string
+  default     = "16"
+
+  validation {
+    condition     = contains(["14", "15", "16", "17"], var.postgresql_version)
+    error_message = "postgresql_version must be a supported Azure PostgreSQL Flexible Server version."
+  }
+}
+
+variable "postgresql_sku_name" {
+  description = "PostgreSQL Flexible Server SKU. The default is a low-cost development SKU."
+  type        = string
+  default     = "B_Standard_B1ms"
+}
+
+variable "postgresql_storage_mb" {
+  description = "PostgreSQL storage allocation in megabytes."
+  type        = number
+  default     = 32768
+
+  validation {
+    condition     = var.postgresql_storage_mb >= 32768
+    error_message = "postgresql_storage_mb must be at least 32768."
+  }
+}
+
+variable "postgresql_backup_retention_days" {
+  description = "PostgreSQL backup retention period in days."
+  type        = number
+  default     = 7
+
+  validation {
+    condition     = var.postgresql_backup_retention_days >= 7 && var.postgresql_backup_retention_days <= 35
+    error_message = "postgresql_backup_retention_days must be between 7 and 35."
+  }
+}
+
+variable "postgresql_zone" {
+  description = "Availability zone for PostgreSQL. Set null where zones are unavailable."
+  type        = string
+  default     = "1"
+  nullable    = true
+}
+
 variable "tags" {
   description = "Common tags passed to all modules."
   type        = map(string)
