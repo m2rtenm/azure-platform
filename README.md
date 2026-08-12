@@ -4,7 +4,7 @@ Terraform-managed Azure platform, built incrementally as a production-style port
 
 ## Current phase
 
-**Phase 6 — PostgreSQL** is implemented and ready to apply. It adds a private Azure Database for PostgreSQL Flexible Server for platform workloads.
+**Phase 7 — Key Vault** is implemented and ready to apply. It adds a private, RBAC-authorized Key Vault for platform secrets and PostgreSQL credentials.
 
 Completed phases:
 
@@ -14,6 +14,7 @@ Completed phases:
 4. **Container Registry** — Basic SKU image registry, with Entra ID/RBAC authentication and admin access disabled.
 5. **AKS** — system and user pools, autoscaling, Azure CNI Overlay, Azure RBAC/Policy, OIDC/workload identity, Container Insights, and least-privilege ACR pulls.
 6. **PostgreSQL** — private Flexible Server, delegated subnet, private DNS, generated administrator credential, automated backups, and an initial application database.
+7. **Key Vault** — RBAC authorization, private endpoint and DNS, soft delete, purge protection, PostgreSQL secrets, and a least-privilege workload identity.
 
 ## Repository layout
 
@@ -28,6 +29,7 @@ azure-platform/
 │   ├── acr/          # Azure Container Registry
 │   └── aks/          # AKS cluster, node pools, RBAC, and identity
 │   └── postgresql/   # Private PostgreSQL Flexible Server and DNS
+│   └── keyvault/     # Private RBAC Key Vault and platform secrets
 ├── docs/             # Platform documentation
 └── .github/          # CI/CD workflows added in a later phase
 ```
@@ -36,7 +38,7 @@ Do not commit generated `*.tfvars` files or Terraform state. The repository `.gi
 
 ## Next step
 
-The Phase 6 apply creates ACR, AKS, the Log Analytics workspace, and private PostgreSQL resources. These services incur Azure charges.
+The Phase 7 apply creates ACR, AKS, the Log Analytics workspace, private PostgreSQL resources, and private Key Vault resources. These services incur Azure charges.
 
 AKS derives the Microsoft Entra tenant from the active Azure CLI session. To override it, set `tenant_id` in an ignored local `terraform.tfvars`:
 
@@ -63,3 +65,5 @@ kubectl get nodes
 See [`modules/aks/README.md`](modules/aks/README.md) for the module architecture and network requirements.
 
 See [`modules/postgresql/README.md`](modules/postgresql/README.md) for the private networking and state-security considerations.
+
+See [`modules/keyvault/README.md`](modules/keyvault/README.md) for Key Vault access and secret-management guidance.

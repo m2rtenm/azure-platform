@@ -93,3 +93,23 @@ output "postgresql_administrator_password" {
   value       = module.postgresql.administrator_password
   sensitive   = true
 }
+
+output "key_vault_id" {
+  description = "Key Vault resource ID."
+  value       = module.keyvault.id
+}
+
+output "key_vault_name" {
+  description = "Key Vault name."
+  value       = module.keyvault.name
+}
+
+output "key_vault_uri" {
+  description = "Private Key Vault URI."
+  value       = module.keyvault.uri
+}
+
+output "key_vault_workload_identity_client_id" {
+  description = "Client ID of the Key Vault secrets workload identity."
+  value       = module.keyvault.workload_identity_client_id
+}
