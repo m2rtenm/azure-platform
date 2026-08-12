@@ -45,9 +45,13 @@ resource "azurerm_postgresql_flexible_server" "this" {
     start_minute = 0
   }
 
-  high_availability {
-    mode                      = var.high_availability_enabled ? "ZoneRedundant" : "Disabled"
-    standby_availability_zone = var.high_availability_enabled ? var.standby_availability_zone : null
+  dynamic "high_availability" {
+    for_each = var.high_availability_enabled ? [var.standby_availability_zone] : []
+
+    content {
+      mode                      = "ZoneRedundant"
+      standby_availability_zone = high_availability.value
+    }
   }
 
   tags = var.tags
