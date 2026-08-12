@@ -1,0 +1,14 @@
+controller:
+  replicaCount: 2
+  service:
+    type: LoadBalancer
+    externalTrafficPolicy: Local
+  config:
+    use-forwarded-headers: "true"
+    compute-full-forwarded-for: "true"
+  metrics:
+    enabled: true
+    serviceMonitor:
+      enabled: true
+  admissionWebhooks:
+    enabled: true

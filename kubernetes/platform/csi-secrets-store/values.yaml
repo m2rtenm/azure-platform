@@ -1,0 +1,7 @@
+linux:
+  enabled: true
+secrets-store-csi-driver:
+  syncSecret:
+    enabled: false
+  enableSecretRotation: true
+  rotationPollInterval: 2m
