@@ -1,6 +1,6 @@
 # Development environment
 
-This is the Terraform root for the development platform. It uses the shared Azure Blob backend created by `bootstrap/` and composes networking, ACR, AKS, PostgreSQL, and the Log Analytics workspace required by AKS Container Insights.
+This is the Terraform root for the development platform. It uses the shared Azure Blob backend created by `bootstrap/` and composes networking, ACR, AKS, PostgreSQL, Key Vault, and the Log Analytics workspace required by AKS Container Insights.
 
 ## Backend setup
 
@@ -39,4 +39,4 @@ Retrieve it with:
 az account show --query tenantId --output tsv
 ```
 
-The current configuration includes ACR, AKS, and private PostgreSQL. It generates a PostgreSQL administrator password and stores it in encrypted remote Terraform state, so restrict backend access. Review the plan carefully because these services incur Azure charges.
+The current configuration includes ACR, AKS, private PostgreSQL, and private Key Vault. It generates a PostgreSQL administrator password, stores it in Key Vault, and retains it in encrypted remote Terraform state, so restrict backend access. Review the plan carefully because these services incur Azure charges.

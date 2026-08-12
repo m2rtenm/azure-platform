@@ -166,6 +166,17 @@ variable "postgresql_zone" {
   nullable    = true
 }
 
+variable "key_vault_sku_name" {
+  description = "Key Vault SKU. Standard is sufficient for secret storage."
+  type        = string
+  default     = "standard"
+
+  validation {
+    condition     = contains(["standard", "premium"], var.key_vault_sku_name)
+    error_message = "key_vault_sku_name must be standard or premium."
+  }
+}
+
 variable "tags" {
   description = "Common tags passed to all modules."
   type        = map(string)

@@ -67,3 +67,21 @@ module "postgresql" {
   zone                  = var.postgresql_zone
   tags                  = var.tags
 }
+
+module "keyvault" {
+  source = "../../modules/keyvault"
+
+  location                          = var.location
+  resource_group_name               = module.network.resource_group_name
+  name_prefix                       = local.name_prefix
+  tenant_id                         = data.azurerm_client_config.current.tenant_id
+  deployer_object_id                = data.azurerm_client_config.current.object_id
+  virtual_network_id                = module.network.vnet_id
+  private_endpoint_subnet_id        = module.network.subnet_ids.private_endpoints
+  postgresql_administrator_login    = module.postgresql.administrator_login
+  postgresql_administrator_password = module.postgresql.administrator_password
+  postgresql_fqdn                   = module.postgresql.fqdn
+  postgresql_database_name          = module.postgresql.database_name
+  sku_name                          = var.key_vault_sku_name
+  tags                              = var.tags
+}
