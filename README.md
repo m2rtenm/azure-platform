@@ -4,7 +4,7 @@ Terraform-managed Azure platform, built incrementally as a production-style port
 
 ## Current phase
 
-**Phase 9 — Monitoring** is implemented and ready to apply. It centralizes Azure platform logs and metrics in Log Analytics.
+**Phase 10 — Kubernetes Platform** is implemented. It declares the in-cluster ingress, certificates, secrets, observability, and GitOps foundation.
 
 Completed phases:
 
@@ -17,6 +17,7 @@ Completed phases:
 7. **Key Vault** — RBAC authorization, private endpoint and DNS, soft delete, purge protection, PostgreSQL secrets, and a least-privilege workload identity.
 8. **Application Gateway** — public static IP, HTTPS listener, WAF v2 OWASP policy, autoscaling, and an AKS ingress-ready backend pool.
 9. **Monitoring** — Log Analytics workspace, AKS Container Insights, and diagnostics for AKS, PostgreSQL, Key Vault, Application Gateway, and ACR.
+10. **Kubernetes Platform** — Helmfile-managed ingress-nginx, cert-manager, External Secrets, CSI driver, Prometheus, Grafana, Loki, and Argo CD.
 
 ## Repository layout
 
@@ -34,6 +35,8 @@ azure-platform/
 │   └── keyvault/     # Private RBAC Key Vault and platform secrets
 │   └── application_gateway/ # Public WAF v2 HTTPS ingress
 │   └── monitoring/   # Platform diagnostics and Log Analytics
+├── kubernetes/
+│   └── platform/     # Helmfile-managed in-cluster platform services
 ├── docs/             # Platform documentation
 └── .github/          # CI/CD workflows added in a later phase
 ```
@@ -73,12 +76,14 @@ az aks get-credentials --resource-group rg-azplat-dev-neu --name aks-azplat-dev
 kubectl get nodes
 ```
 
-See [`modules/aks/README.md`](modules/aks/README.md) for the module architecture and network requirements.
+See [`kubernetes/platform/README.md`](kubernetes/platform/README.md) for in-cluster platform bootstrap and GitOps handoff.
 
-See [`modules/postgresql/README.md`](modules/postgresql/README.md) for the private networking and state-security considerations.
+## Documentation
 
-See [`modules/keyvault/README.md`](modules/keyvault/README.md) for Key Vault access and secret-management guidance.
-
-See [`modules/application_gateway/README.md`](modules/application_gateway/README.md) for certificate handling, WAF, and backend-integration guidance.
-
-See [`modules/monitoring/README.md`](modules/monitoring/README.md) for diagnostics coverage, retention, and cost guidance.
+- [Networking](docs/networking.md)
+- [AKS](docs/aks.md)
+- [Container Registry](docs/container-registry.md)
+- [PostgreSQL](docs/postgresql.md)
+- [Key Vault](docs/key-vault.md)
+- [Application Gateway](docs/application-gateway.md)
+- [Monitoring](docs/monitoring.md)
