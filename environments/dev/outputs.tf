@@ -113,3 +113,18 @@ output "key_vault_workload_identity_client_id" {
   description = "Client ID of the Key Vault secrets workload identity."
   value       = module.keyvault.workload_identity_client_id
 }
+
+output "application_gateway_id" {
+  description = "Application Gateway resource ID."
+  value       = module.application_gateway.id
+}
+
+output "application_gateway_name" {
+  description = "Application Gateway name."
+  value       = module.application_gateway.name
+}
+
+output "application_gateway_public_ip_address" {
+  description = "Public IP address assigned to Application Gateway."
+  value       = module.application_gateway.public_ip_address
+}
