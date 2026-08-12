@@ -4,7 +4,7 @@ Terraform-managed Azure platform, built incrementally as a production-style port
 
 ## Current phase
 
-**Phase 10 — Kubernetes Platform** is implemented. It declares the in-cluster ingress, certificates, secrets, observability, and GitOps foundation.
+**Phases 11–15 — GitOps, sample delivery, CI/CD, hardening, and operations** are implemented. Argo CD reconciles the sample app, GitHub Actions delivers immutable ACR images using OIDC, and the repository includes security controls and runbooks.
 
 Completed phases:
 
@@ -18,6 +18,11 @@ Completed phases:
 8. **Application Gateway** — public static IP, HTTPS listener, WAF v2 OWASP policy, autoscaling, and an AKS ingress-ready backend pool.
 9. **Monitoring** — Log Analytics workspace, AKS Container Insights, and diagnostics for AKS, PostgreSQL, Key Vault, Application Gateway, and ACR.
 10. **Kubernetes Platform** — Helmfile-managed ingress-nginx, cert-manager, External Secrets, CSI driver, Prometheus, Grafana, Loki, and Argo CD.
+11. **GitOps** — Argo CD app-of-apps bootstrap, a scoped project, automated synchronization, pruning, and drift repair.
+12. **Sample application** — ACR-delivered frontend and PostgreSQL-backed API with Key Vault External Secrets, hardened workloads, and ingress.
+13. **CI/CD** — OIDC-based Terraform plan/apply plus scanned, attested image build and GitOps promotion workflows.
+14. **Security hardening** — Subject-bound CI identity, least-privilege delivery roles, Pod Security Admission, network policies, and runtime controls.
+15. **Operations documentation** — Architecture diagrams, delivery guidance, and incident/rollback runbooks.
 
 ## Repository layout
 
@@ -36,16 +41,19 @@ azure-platform/
 │   └── application_gateway/ # Public WAF v2 HTTPS ingress
 │   └── monitoring/   # Platform diagnostics and Log Analytics
 ├── kubernetes/
-│   └── platform/     # Helmfile-managed in-cluster platform services
+│   ├── platform/     # Helmfile-managed in-cluster platform services
+│   ├── argocd/       # App-of-apps GitOps bootstrap and project policy
+│   └── apps/         # Kustomize application deployments
+├── apps/             # Sample frontend and PostgreSQL-backed API source
 ├── docs/             # Platform documentation
-└── .github/          # CI/CD workflows added in a later phase
+└── .github/          # OIDC Terraform and application-delivery workflows
 ```
 
 Do not commit generated `*.tfvars` files or Terraform state. The repository `.gitignore` protects both by default.
 
-## Next step
+## Deployment sequence
 
-The Phase 9 apply creates ACR, AKS, a centralized Log Analytics workspace, private PostgreSQL and Key Vault resources, Application Gateway WAF v2, and platform diagnostic settings. These services incur Azure charges.
+The Terraform apply creates ACR, AKS, a centralized Log Analytics workspace, private PostgreSQL and Key Vault resources, Application Gateway WAF v2, diagnostics, and the GitHub Actions OIDC identity. These services incur Azure charges.
 
 AKS derives the Microsoft Entra tenant from the active Azure CLI session. To override it, set `tenant_id` in an ignored local `terraform.tfvars`:
 
@@ -76,7 +84,19 @@ az aks get-credentials --resource-group rg-azplat-dev-neu --name aks-azplat-dev
 kubectl get nodes
 ```
 
-See [`kubernetes/platform/README.md`](kubernetes/platform/README.md) for in-cluster platform bootstrap and GitOps handoff.
+Apply the Helmfile platform components, then bootstrap Argo CD:
+
+```bash
+./kubernetes/argocd/bootstrap.sh
+```
+
+Complete the GitHub `dev` Environment variables and state-storage RBAC in
+[`.github/workflows/README.md`](.github/workflows/README.md). The first app
+delivery workflow run builds and promotes non-routable bootstrap images to ACR.
+
+See [`kubernetes/platform/README.md`](kubernetes/platform/README.md) for the
+in-cluster platform bootstrap and [`docs/runbooks.md`](docs/runbooks.md) for
+operational recovery.
 
 ## Documentation
 
@@ -87,3 +107,8 @@ See [`kubernetes/platform/README.md`](kubernetes/platform/README.md) for in-clus
 - [Key Vault](docs/key-vault.md)
 - [Application Gateway](docs/application-gateway.md)
 - [Monitoring](docs/monitoring.md)
+- [GitOps](docs/gitops.md)
+- [Sample application](docs/application.md)
+- [CI/CD](docs/cicd.md)
+- [Security](docs/security.md)
+- [Runbooks](docs/runbooks.md)

@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-backend
+  labels:
+    app.kubernetes.io/name: sample-backend
+    app.kubernetes.io/part-of: sample-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sample-backend
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: sample-backend
+        app.kubernetes.io/part-of: sample-app
+        azure.workload.identity/use: "false"
+    spec:
+      serviceAccountName: sample-backend
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: backend
+          image: sample-backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: sample-database
+                  key: DATABASE_URL
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65532
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 128Mi
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: sample-backend
+  labels:
+    app.kubernetes.io/name: sample-backend
+spec:
+  selector:
+    app.kubernetes.io/name: sample-backend
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http

@@ -1,0 +1,110 @@
+name: Terraform
+
+on:
+  pull_request:
+    paths:
+      - "bootstrap/**"
+      - "environments/**"
+      - "modules/**"
+      - ".github/workflows/terraform.yml"
+  push:
+    branches: [main]
+    paths:
+      - "bootstrap/**"
+      - "environments/**"
+      - "modules/**"
+      - ".github/workflows/terraform.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: terraform-dev-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: false
+
+env:
+  ARM_USE_OIDC: true
+  ARM_USE_AZUREAD: true
+  ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+  ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+  TF_IN_AUTOMATION: true
+
+jobs:
+  validate:
+    name: Format and validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+      - run: terraform fmt -check -recursive
+      - run: terraform -chdir=environments/dev init -backend=false
+      - run: terraform -chdir=environments/dev validate
+
+  plan:
+    name: Plan development platform
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      TF_VAR_application_gateway_ssl_certificate_data: ${{ secrets.APPLICATION_GATEWAY_SSL_CERTIFICATE_DATA }}
+      TF_VAR_application_gateway_ssl_certificate_password: ${{ secrets.APPLICATION_GATEWAY_SSL_CERTIFICATE_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+      - name: Initialize Azure AD-backed state
+        run: >
+          terraform -chdir=environments/dev init -input=false
+          -backend-config="resource_group_name=${{ vars.TF_BACKEND_RESOURCE_GROUP }}"
+          -backend-config="storage_account_name=${{ vars.TF_BACKEND_STORAGE_ACCOUNT }}"
+          -backend-config="container_name=${{ vars.TF_BACKEND_CONTAINER }}"
+          -backend-config="key=${{ vars.TF_BACKEND_KEY }}"
+          -backend-config="use_oidc=true"
+          -backend-config="use_azuread_auth=true"
+      - run: terraform -chdir=environments/dev plan -input=false -no-color -out=platform.tfplan
+      - uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan
+          path: environments/dev/platform.tfplan
+          retention-days: 7
+
+  apply:
+    name: Apply development platform
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    needs: plan
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      TF_VAR_application_gateway_ssl_certificate_data: ${{ secrets.APPLICATION_GATEWAY_SSL_CERTIFICATE_DATA }}
+      TF_VAR_application_gateway_ssl_certificate_password: ${{ secrets.APPLICATION_GATEWAY_SSL_CERTIFICATE_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: azure/login@v2
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+      - name: Initialize Azure AD-backed state
+        run: >
+          terraform -chdir=environments/dev init -input=false
+          -backend-config="resource_group_name=${{ vars.TF_BACKEND_RESOURCE_GROUP }}"
+          -backend-config="storage_account_name=${{ vars.TF_BACKEND_STORAGE_ACCOUNT }}"
+          -backend-config="container_name=${{ vars.TF_BACKEND_CONTAINER }}"
+          -backend-config="key=${{ vars.TF_BACKEND_KEY }}"
+          -backend-config="use_oidc=true"
+          -backend-config="use_azuread_auth=true"
+      - run: terraform -chdir=environments/dev apply -input=false -auto-approve

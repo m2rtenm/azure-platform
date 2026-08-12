@@ -7,4 +7,10 @@ server:
     enabled: false
 configs:
   params:
-    server.insecure: "true"
+    server.insecure: "false"
+  cm:
+    application.resourceTrackingMethod: annotation+label
+    exec.enabled: "false"
+    statusbadge.enabled: "false"
+  rbac:
+    policy.default: role:readonly

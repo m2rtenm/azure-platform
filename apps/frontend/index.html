@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Azure Platform Sample</title>
+    <style>
+      body { font-family: system-ui, sans-serif; margin: 4rem auto; max-width: 44rem; padding: 0 1rem; }
+      code { background: #eef2ff; padding: .15rem .35rem; }
+      #result { white-space: pre-wrap; }
+    </style>
+  </head>
+  <body>
+    <h1>Azure Platform Sample</h1>
+    <p>This frontend is delivered through Argo CD and calls a PostgreSQL-backed API.</p>
+    <p id="result">Loading <code>/api/v1/message</code>…</p>
+    <script>
+      fetch("/api/v1/message")
+        .then((response) => response.ok ? response.json() : Promise.reject(response.statusText))
+        .then((data) => { document.getElementById("result").textContent = data.message + "\nDatabase: " + data.database; })
+        .catch((error) => { document.getElementById("result").textContent = "API unavailable: " + error; });
+    </script>
+  </body>
+</html>
