@@ -133,3 +133,8 @@ output "application_gateway_public_ip_address" {
   description = "Public IP address assigned to Application Gateway."
   value       = module.application_gateway.public_ip_address
 }
+
+output "github_actions_client_id" {
+  description = "Managed identity client ID for the GitHub Actions Azure OIDC login."
+  value       = module.github_actions_identity.client_id
+}

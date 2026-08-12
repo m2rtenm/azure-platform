@@ -106,3 +106,15 @@ module "monitoring" {
   acr_id                 = module.acr.id
   tags                   = var.tags
 }
+
+module "github_actions_identity" {
+  source = "../../modules/github_actions_identity"
+
+  location               = var.location
+  resource_group_name    = module.network.resource_group_name
+  resource_group_id      = module.network.resource_group_id
+  name_prefix            = local.name_prefix
+  github_actions_subject = var.github_actions_subject
+  acr_id                 = module.acr.id
+  tags                   = var.tags
+}

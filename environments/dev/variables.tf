@@ -214,6 +214,12 @@ variable "application_gateway_max_capacity" {
   default     = 2
 }
 
+variable "github_actions_subject" {
+  description = "Exact GitHub Actions OIDC subject trusted by the platform delivery identity."
+  type        = string
+  default     = "repo:m2rtenm/azure-platform:environment:dev"
+}
+
 variable "tags" {
   description = "Common tags passed to all modules."
   type        = map(string)

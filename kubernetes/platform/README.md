@@ -36,11 +36,17 @@ Phase 10 declares the in-cluster platform components as Helm releases through `h
    envsubst < workload-identity/service-account.yaml | kubectl apply -f -
    helmfile sync
    envsubst < external-secrets/cluster-secret-store.yaml | kubectl apply -f -
-   kubectl apply -f external-secrets/postgresql-secret.yaml
    ```
 
 `GRAFANA_ADMIN_PASSWORD` is intentionally not committed. Provide it as a secure Helmfile environment value or integrate Grafana with Key Vault before deploying it.
 
 ## GitOps handoff
 
-The Argo CD release is intentionally configured with no ingress and an example domain. Phase 11 promotes these Helm releases and application manifests into the Argo CD application tree.
+Argo CD keeps its API private behind a ClusterIP service and requires TLS. Its
+default role is read-only; grant elevated access through the organization SSO
+and an explicit Argo CD RBAC policy before exposing it.
+
+After the chart is healthy, bootstrap the application tree described in
+[`../argocd/README.md`](../argocd/README.md). Application PostgreSQL
+credentials are now declared alongside the workload as an `ExternalSecret`, so
+they are created only in the application namespace.
