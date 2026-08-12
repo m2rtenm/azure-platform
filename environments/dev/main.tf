@@ -24,15 +24,6 @@ module "acr" {
   tags                = var.tags
 }
 
-resource "azurerm_log_analytics_workspace" "aks" {
-  name                = "log-${local.name_prefix}-aks"
-  location            = var.location
-  resource_group_name = module.network.resource_group_name
-  sku                 = "PerGB2018"
-  retention_in_days   = var.log_analytics_retention_in_days
-  tags                = var.tags
-}
-
 module "aks" {
   source = "../../modules/aks"
 
@@ -42,7 +33,7 @@ module "aks" {
   subnet_id                  = module.network.subnet_ids.aks
   acr_id                     = module.acr.id
   tenant_id                  = coalesce(var.tenant_id, data.azurerm_client_config.current.tenant_id)
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.aks.id
+  log_analytics_workspace_id = module.monitoring.log_analytics_workspace_id
   kubernetes_version         = var.kubernetes_version
   sku_tier                   = var.aks_sku_tier
   system_node_pool           = var.aks_system_node_pool
@@ -99,4 +90,19 @@ module "application_gateway" {
   min_capacity             = var.application_gateway_min_capacity
   max_capacity             = var.application_gateway_max_capacity
   tags                     = var.tags
+}
+
+module "monitoring" {
+  source = "../../modules/monitoring"
+
+  location               = var.location
+  resource_group_name    = module.network.resource_group_name
+  name_prefix            = local.name_prefix
+  retention_in_days      = var.log_analytics_retention_in_days
+  aks_id                 = module.aks.id
+  postgresql_id          = module.postgresql.id
+  key_vault_id           = module.keyvault.id
+  application_gateway_id = module.application_gateway.id
+  acr_id                 = module.acr.id
+  tags                   = var.tags
 }

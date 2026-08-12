@@ -65,7 +65,12 @@ output "aks_kubelet_identity_principal_id" {
 
 output "log_analytics_workspace_id" {
   description = "Log Analytics workspace resource ID used by AKS Container Insights."
-  value       = azurerm_log_analytics_workspace.aks.id
+  value       = module.monitoring.log_analytics_workspace_id
+}
+
+output "log_analytics_workspace_name" {
+  description = "Log Analytics workspace name."
+  value       = module.monitoring.log_analytics_workspace_name
 }
 
 output "postgresql_server_id" {
