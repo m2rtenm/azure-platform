@@ -85,3 +85,18 @@ module "keyvault" {
   sku_name                          = var.key_vault_sku_name
   tags                              = var.tags
 }
+
+module "application_gateway" {
+  source = "../../modules/application_gateway"
+
+  location                 = var.location
+  resource_group_name      = module.network.resource_group_name
+  name_prefix              = local.name_prefix
+  subnet_id                = module.network.subnet_ids.application_gateway
+  ssl_certificate_data     = var.application_gateway_ssl_certificate_data
+  ssl_certificate_password = var.application_gateway_ssl_certificate_password
+  waf_mode                 = var.application_gateway_waf_mode
+  min_capacity             = var.application_gateway_min_capacity
+  max_capacity             = var.application_gateway_max_capacity
+  tags                     = var.tags
+}

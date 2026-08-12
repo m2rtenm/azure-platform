@@ -4,7 +4,7 @@ Terraform-managed Azure platform, built incrementally as a production-style port
 
 ## Current phase
 
-**Phase 7 — Key Vault** is implemented and ready to apply. It adds a private, RBAC-authorized Key Vault for platform secrets and PostgreSQL credentials.
+**Phase 8 — Application Gateway** is implemented and ready to apply. It adds a public Azure Application Gateway WAF v2 baseline for secure HTTPS ingress.
 
 Completed phases:
 
@@ -15,6 +15,7 @@ Completed phases:
 5. **AKS** — system and user pools, autoscaling, Azure CNI Overlay, Azure RBAC/Policy, OIDC/workload identity, Container Insights, and least-privilege ACR pulls.
 6. **PostgreSQL** — private Flexible Server, delegated subnet, private DNS, generated administrator credential, automated backups, and an initial application database.
 7. **Key Vault** — RBAC authorization, private endpoint and DNS, soft delete, purge protection, PostgreSQL secrets, and a least-privilege workload identity.
+8. **Application Gateway** — public static IP, HTTPS listener, WAF v2 OWASP policy, autoscaling, and an AKS ingress-ready backend pool.
 
 ## Repository layout
 
@@ -30,6 +31,7 @@ azure-platform/
 │   └── aks/          # AKS cluster, node pools, RBAC, and identity
 │   └── postgresql/   # Private PostgreSQL Flexible Server and DNS
 │   └── keyvault/     # Private RBAC Key Vault and platform secrets
+│   └── application_gateway/ # Public WAF v2 HTTPS ingress
 ├── docs/             # Platform documentation
 └── .github/          # CI/CD workflows added in a later phase
 ```
@@ -38,12 +40,19 @@ Do not commit generated `*.tfvars` files or Terraform state. The repository `.gi
 
 ## Next step
 
-The Phase 7 apply creates ACR, AKS, the Log Analytics workspace, private PostgreSQL resources, and private Key Vault resources. These services incur Azure charges.
+The Phase 8 apply creates ACR, AKS, the Log Analytics workspace, private PostgreSQL and Key Vault resources, plus Application Gateway WAF v2. These services incur Azure charges.
 
 AKS derives the Microsoft Entra tenant from the active Azure CLI session. To override it, set `tenant_id` in an ignored local `terraform.tfvars`:
 
 ```bash
 tenant_id = "<your-microsoft-entra-tenant-id>"
+```
+
+Add the HTTPS listener certificate values to the same ignored file:
+
+```hcl
+application_gateway_ssl_certificate_data     = "<base64-encoded-pfx>"
+application_gateway_ssl_certificate_password = "<pfx-password>"
 ```
 
 Then review and apply the platform plan:
@@ -67,3 +76,5 @@ See [`modules/aks/README.md`](modules/aks/README.md) for the module architecture
 See [`modules/postgresql/README.md`](modules/postgresql/README.md) for the private networking and state-security considerations.
 
 See [`modules/keyvault/README.md`](modules/keyvault/README.md) for Key Vault access and secret-management guidance.
+
+See [`modules/application_gateway/README.md`](modules/application_gateway/README.md) for certificate handling, WAF, and backend-integration guidance.

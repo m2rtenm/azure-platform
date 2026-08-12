@@ -177,6 +177,43 @@ variable "key_vault_sku_name" {
   }
 }
 
+variable "application_gateway_ssl_certificate_data" {
+  description = "Base64-encoded PFX certificate for the Application Gateway HTTPS listener."
+  type        = string
+  sensitive   = true
+  nullable    = false
+}
+
+variable "application_gateway_ssl_certificate_password" {
+  description = "Password for the Application Gateway HTTPS listener PFX certificate."
+  type        = string
+  sensitive   = true
+  nullable    = false
+}
+
+variable "application_gateway_waf_mode" {
+  description = "Application Gateway WAF mode."
+  type        = string
+  default     = "Prevention"
+
+  validation {
+    condition     = contains(["Detection", "Prevention"], var.application_gateway_waf_mode)
+    error_message = "application_gateway_waf_mode must be Detection or Prevention."
+  }
+}
+
+variable "application_gateway_min_capacity" {
+  description = "Minimum Application Gateway WAF v2 capacity."
+  type        = number
+  default     = 1
+}
+
+variable "application_gateway_max_capacity" {
+  description = "Maximum Application Gateway WAF v2 capacity."
+  type        = number
+  default     = 2
+}
+
 variable "tags" {
   description = "Common tags passed to all modules."
   type        = map(string)
